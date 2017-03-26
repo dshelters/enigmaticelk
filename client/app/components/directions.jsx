@@ -94,7 +94,7 @@ class Directions extends React.Component {
 
   displayLegend() {
     if (this.state.origDest) {
-      return <Legend />;
+      return <Legend ratingInfo={this.props.ratingInfo} />;
     }
   }
 
