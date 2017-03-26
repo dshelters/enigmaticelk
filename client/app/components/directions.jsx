@@ -27,6 +27,7 @@ class Directions extends React.Component {
       let routeIndex = directionsDisplay.getRouteIndex();
       this.props.getCrimeData(directions.routes[routeIndex].legs[0].steps);
     });
+
     this.setState({
       directionsService: directionsService,
       directionsDisplay: directionsDisplay
@@ -45,8 +46,8 @@ class Directions extends React.Component {
     };
     if (this.props.streetLines) {
       this.props.streetLines.forEach((line) => {
-        let origin = `${line[0][1]},${line[0][0]}`;
-        let dest = `${line[1][1]},${line[1][0]}`;
+        let origin = [line[0][1], line[0][0]];
+        let dest = [line[1][1], line[1][0]];
         this.drawLine(origin, dest, line[2].rating);
       });
     }
@@ -67,32 +68,22 @@ class Directions extends React.Component {
   }
 
   drawLine(origin, destination, rating) {
-    let options = {
+
+    let path = [
+      {lat: origin[0], lng: origin[1]},
+      {lat: destination[0], lng: destination[1]},
+    ];
+
+    let step = new google.maps.Polyline({
+      path: path,
+      geodesic: true,
       strokeColor: rating,
       strokeOpacity: 0.75,
-      strokeWeight: 5
-    };
-
-    let dirRenderer = new google.maps.DirectionsRenderer({
-      suppressMarkers: true,
-      polylineOptions: options,
-      preserveViewport: true
+      strokeWeight: 4
     });
 
-    this.state.lines.push(dirRenderer);
-    dirRenderer.setMap(this.props.map);
-
-    let request = {
-      origin: origin,
-      destination: destination,
-      travelMode: 'WALKING'
-    };
-
-    this.state.directionsService.route(request, (response, status) => {
-      if (status === 'OK') {
-        dirRenderer.setDirections(response);
-      }
-    });
+    this.state.lines.push(step)
+    step.setMap(this.props.map);
   }
 
   clearLines() {
